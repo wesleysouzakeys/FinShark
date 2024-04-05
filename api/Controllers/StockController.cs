@@ -8,6 +8,7 @@ using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,14 +27,15 @@ namespace api.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var stocks = await _stockRepo.GetAllAsync(query);
-            // Select() é a versão do .NET de um .map() em JavaScript
-            var stockDto = stocks.Select(s => s.ToStockDTO());
+            // Select() é a versão do .NET de um .map() em JavaScript, sendo possível transformar e adequar o objeto conforme necessidade
+            var stockDto = stocks.Select(s => s.ToStockDTO()).ToList();
             return Ok(stocks);
         }
 
